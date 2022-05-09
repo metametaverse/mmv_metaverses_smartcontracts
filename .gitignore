@@ -1,0 +1,3 @@
+# do not track build artifacts
+*.deps
+*/artifacts
