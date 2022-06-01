@@ -17,13 +17,13 @@ contract LandMinter is ERC721, Ownable {
     mapping(address => uint[]) public addressTokenIds;
     mapping(address => FreeAllocationDetails[]) public addressFreePendingAllocations;
 
-    event TokenAssigned(address indexed to, address indexed from, uint indexed tokenId);
+    event TokenAssigned(address indexed to, address indexed from, uint indexed tokenId, int8 x, int8 y, int8 z, uint parentTokenId);
 
     constructor() ERC721("MMV Land", "MVLD") { }
 
     Counters.Counter private _tokenIDs;
 
-    function assignTokenToAddress(uint8 _x, uint8 _y, uint8 _z, uint _parentId, address _to) external onlyOwner {
+    function assignTokenToAddress(int8 _x, int8 _y, int8 _z, uint _parentId, address _to) external onlyOwner {
         require(Utils.CheckCoordinateNotMinted(tokenIdlandDetails, parentIdMintedLandIds, _x, _y, _z, _parentId), "This metaverse alredy minted");
         uint tokenId = calculateTokenId();
         require(!_exists(tokenId), "Token already minted");
@@ -37,10 +37,10 @@ contract LandMinter is ERC721, Ownable {
             Utils.GiveBonusAllocations(addressFreePendingAllocations, tokenIdlandDetails, _to, tokenId);
         }
 
-        emit TokenAssigned(_to, address(0), tokenId);
+        emit TokenAssigned(_to, address(0), tokenId, _x, _y, _z, _parentId);
     }
 
-    function mint(uint8 _x, uint8 _y, uint8 _z, uint _parentId, LandType _landType) external payable {
+    function mint(int8 _x, int8 _y, int8 _z, uint _parentId, LandType _landType) external payable {
         require(Utils.CheckCoordinateNotMinted(tokenIdlandDetails, parentIdMintedLandIds, _x, _y, _z, _parentId), "This metaverse alredy minted");
         require(checkParentTokenExists(_parentId), "Parent metaverse hasn't been minted yet");
         
@@ -55,10 +55,10 @@ contract LandMinter is ERC721, Ownable {
 
         _mint(msg.sender, tokenId);
 
-        emit TokenAssigned(msg.sender, address(0), tokenId);
+        emit TokenAssigned(msg.sender, address(0), tokenId, _x, _y, _z, _parentId);
     }
 
-    function claim(uint8 _x, uint8 _y, uint8 _z, uint _parentId, LandType _landType) external {
+    function claim(int8 _x, int8 _y, int8 _z, uint _parentId, LandType _landType) external {
         require(Utils.CheckCoordinateNotMinted(tokenIdlandDetails, parentIdMintedLandIds, _x, _y, _z, _parentId), "This metaverse alredy minted");
         require(Utils.UseFreeAllocationAvailable(addressFreePendingAllocations, msg.sender, _parentId, _landType), "You don't have free metaverses of selected type to claim");
         require(checkParentTokenExists(_parentId), "Parent metaverse hasn't been minted yet");
@@ -71,7 +71,7 @@ contract LandMinter is ERC721, Ownable {
 
         _mint(msg.sender, tokenId);
 
-        emit TokenAssigned(msg.sender, address(0), tokenId);
+        emit TokenAssigned(msg.sender, address(0), tokenId, _x, _y, _z, _parentId);
     }
 
     function withdrowal(address _address) external onlyOwner {

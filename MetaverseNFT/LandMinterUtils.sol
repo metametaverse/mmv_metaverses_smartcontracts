@@ -75,9 +75,9 @@ library Utils {
     function CheckCoordinateNotMinted(
         mapping(uint => LandDetails) storage _tokenIdlandDetails,
         mapping(uint => uint[]) storage _parentIdMintedLandIds,
-        uint8 _x,
-        uint8 _y,
-        uint8 _z,
+        int8 _x,
+        int8 _y,
+        int8 _z,
         uint _parentId) internal view returns(bool) {
 
         bool alreadyMinted = false;

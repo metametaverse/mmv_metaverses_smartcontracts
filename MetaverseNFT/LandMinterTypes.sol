@@ -10,9 +10,9 @@ enum LandType {
 }
 
 struct LandDetails {
-    uint8 x;
-    uint8 y;
-    uint8 z;
+    int8 x;
+    int8 y;
+    int8 z;
     uint parentTokenId;
     LandType landType;
 }
