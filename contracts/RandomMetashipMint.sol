@@ -14,12 +14,13 @@ contract MintRandomNft is Ownable {
     address _saleFrom;
 
     uint nonce = 0;
-    uint public CurrentPrice = 0.1 ether;
+    uint16 offset = 670;
+    uint public CurrentPrice = 0.2 ether;
 
     mapping(uint8 => mapping(uint16 => bool)) public merkleTree;
     uint8 depth = 13;
 
-    uint16 totalSupply = 5016;
+    uint16 totalSupply = 4346;
 
     function setTokenContract(address tokenAddress, address saleFrom) external onlyOwner {
         _tokenContract = IERC721(tokenAddress);
@@ -27,18 +28,26 @@ contract MintRandomNft is Ownable {
     }
 
     function random() internal returns (uint16) {
-        uint16 randomnumber = uint16(uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce))) % totalSupply);
+        uint16 randomnumber = 670 + uint16(uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce))) % totalSupply);
         nonce++;
         return 1 + randomnumber;
     }
 
     function mintRandom(string calldata memo) external payable returns (uint16) {
-        require(!merkleTree[depth][1], "All metaships already minted");
         require(msg.value >= CurrentPrice, "Not enough ether");
-        
+        require(!merkleTree[depth][1], "All metaships already minted");
+
         uint16 tokenId = getRandomTokenId();
 
+        while(_tokenContract.ownerOf(tokenId) != _saleFrom){
+            require(!merkleTree[depth][1], "All metaships already minted");
+            uint16 position = tokenId - offset;
+            tokenId = offset + findNearest(position);
+            recalculateMerkle(position, true);
+        }
+
         _tokenContract.transferFrom(_saleFrom, msg.sender, tokenId);
+
 
         if(nonce % 100 == 0) {
             CurrentPrice = CurrentPrice * 103 / 100;
@@ -49,13 +58,18 @@ contract MintRandomNft is Ownable {
         return tokenId;
     }
 
+    function withdrowal(address _address) external onlyOwner {
+        payable(_address).transfer(address(this).balance);
+    }
+
     function getRandomTokenId() internal returns(uint16) {
         uint16 rd = random();
-        if (!merkleTree[0][rd]) {
-            recalculateMerkle(rd, true);
+        uint16 position = rd-offset;
+        if (!merkleTree[0][position]) {
+            recalculateMerkle(position, true);
         } else {
-            rd = findNearest(rd);
-            recalculateMerkle(rd, true);
+            rd = offset + findNearest(position);
+            recalculateMerkle(position, true);
         }
         return rd;
     }
