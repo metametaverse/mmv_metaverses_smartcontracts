@@ -11,7 +11,7 @@ contract MetashipStaking is Ownable {
 
     IERC721 metashipsAddress;
     mapping(address => mapping(uint => uint)) public stakes;
-    uint32 oneDayInSeconds = 1;
+    uint32 oneDayInSeconds = 60*60*24;
 
     function setNftContractAddress(address _nftContract) external onlyOwner {
         metashipsAddress = IERC721(_nftContract);
