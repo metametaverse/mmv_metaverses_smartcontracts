@@ -21,10 +21,19 @@ contract MintRandomNft is Ownable {
     uint8 depth = 13;
 
     uint16 totalSupply = 4346;
+    uint16 public currentSupply = 100;
 
     function setTokenContract(address tokenAddress, address saleFrom) external onlyOwner {
         _tokenContract = IERC721(tokenAddress);
         _saleFrom = saleFrom;
+    }
+
+    function addCurrentSupply(uint16 supply) external onlyOwner {
+        currentSupply += supply;
+    }
+
+    function getAlreadySoldCount() external view returns(uint) {
+        return nonce;
     }
 
     function random() internal returns (uint16) {
@@ -36,7 +45,7 @@ contract MintRandomNft is Ownable {
     function mintRandom(string calldata memo) external payable returns (uint16) {
         require(msg.value >= CurrentPrice, "Not enough ether");
         require(!merkleTree[depth][1], "All metaships already minted");
-
+        require(nonce < currentSupply, "All metaships from current batch already sold, wait for next batch");
         uint16 tokenId = getRandomTokenId();
 
         while(_tokenContract.ownerOf(tokenId) != _saleFrom){
