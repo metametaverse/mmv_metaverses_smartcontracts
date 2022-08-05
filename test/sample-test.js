@@ -82,6 +82,13 @@ describe('RandomMinter', function () {
 
         console.log('here333');
 
+        let availableSupply = await randomMetashipNftContract.getAvailableSupply();
+        let availableSupplyFormatted = +ethers.utils.formatUnits(availableSupply, 0);
+        console.log(availableSupplyFormatted);
+        expect(availableSupplyFormatted).to.be.equal(18);
+        
+        await randomMetashipNftContract.connect(acc1).setCurrentSupply(100);
+
         let mintTxs = [];
         for (let i = 0; i < 98; i++) {
             const transaction = await randomMetashipNftContract
@@ -118,14 +125,14 @@ describe('RandomMinter', function () {
 
         const currentSupply = await randomMetashipNftContract.currentSupply();
         console.log(+ethers.utils.formatUnits(currentSupply, 0));
-        
+
         await expect(
             randomMetashipNftContract
                 .connect(acc2)
                 .mintRandom('test mint', { value: ethers.utils.parseEther(value.toString()) })
         ).to.be.revertedWith('All metaships from current batch already sold, wait for next batch');
 
-        await randomMetashipNftContract.connect(acc1).addCurrentSupply(4200);
+        await randomMetashipNftContract.connect(acc1).setCurrentSupply(4300);
 
         for (let i = 1; i <= 4200; i++) {
             const transaction = await randomMetashipNftContract
@@ -157,7 +164,7 @@ describe('RandomMinter', function () {
               .mintRandom('test mint acc3', { value: ethers.utils.parseEther('0.2') })
           ).to.be.revertedWith('Not enough ether');
 
-        await randomMetashipNftContract.connect(acc1).addCurrentSupply(46);
+        await randomMetashipNftContract.connect(acc1).setCurrentSupply(4346);
 
 
         mintTxs = [];
