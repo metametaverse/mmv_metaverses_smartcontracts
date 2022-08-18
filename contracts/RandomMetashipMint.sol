@@ -217,7 +217,7 @@ contract MintRandomNft is Ownable, VRFConsumerBaseV2 {
     function validatePrice(uint256 count) private {
         uint256 leftToPriceUpdate = 100 - (nonce % 100);
         uint256 requiredPrice;
-        if (leftToPriceUpdate < count) {
+        if (leftToPriceUpdate <= count) {
             requiredPrice = CurrentPrice * leftToPriceUpdate;
             CurrentPrice = (CurrentPrice * 103) / 100;
             requiredPrice += (count - leftToPriceUpdate) * CurrentPrice;

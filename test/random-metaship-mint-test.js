@@ -3,6 +3,53 @@ const { utils } = require('ethers');
 const { ethers, ContractTransaction } = require('hardhat');
 
 describe('RandomMinter', function () {
+    it('Should fail after 100 sold', async function () {
+        [acc1, acc2, acc3, acc4] = await ethers.getSigners();
+        const nftContract = await deployNftSmartContract(acc1);
+        const vrfCoordinator = await deployVrfCoordinatorMockSmartContract(acc1);
+        const randomMetashipMinterContract = await deployRandomNftMinterSmartContract(vrfCoordinator);
+
+        let tx = await vrfCoordinator.setConsumer(randomMetashipMinterContract.address);
+        await tx.wait();
+
+        await preMintNftCollection(nftContract, randomMetashipMinterContract.address, acc1, acc4);
+        await setContractAddress(randomMetashipMinterContract, nftContract.address, acc1.address);
+        await prepareRandomWords(vrfCoordinator, acc1);
+
+        tx = await randomMetashipMinterContract.connect(acc1).setCurrentSupply(5016);
+        await tx.wait();
+
+        let currentPrice = 0.2;
+
+        for (let i = 1; i <= 100; i++) {
+            if ((i - 1) % 100 === 0 && i !== 1) {
+                currentPrice = +((currentPrice * 103) / 100).toFixed(2);
+            }
+            try {
+                let tx = await randomMetashipMinterContract
+                    .connect(acc2)
+                    .mintRandom(1, { value: ethers.utils.parseEther(currentPrice.toString()) });
+                await tx.wait();
+
+                // const res = await vrfCoordinator.getResponse(i);
+                // console.log("random: ", +ethers.utils.formatUnits(res.randomWords[0], 0));
+                // //const random = +ethers.utils.parseUnits(res.randomWords[0], 0);
+                // //console.log('random: ', random);
+                tx = await vrfCoordinator.fulfillRandomWords(i);
+                await tx.wait();
+            } catch (ex) {
+                console.log(currentPrice);
+                throw ex;
+            }
+        }
+
+        await expect(
+            randomMetashipMinterContract
+                .connect(acc2)
+                .mintRandom(1, { value: ethers.utils.parseEther(currentPrice.toString()) })
+        ).to.be.revertedWith('Not enough ether');
+    });
+
     it('Should sell all nfts and fail after 5016 sold', async function () {
         [acc1, acc2, acc3, acc4] = await ethers.getSigners();
         const nftContract = await deployNftSmartContract(acc1);
