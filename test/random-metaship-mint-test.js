@@ -22,9 +22,6 @@ describe('RandomMinter', function () {
         let currentPrice = 0.2;
 
         for (let i = 1; i <= 100; i++) {
-            if ((i - 1) % 100 === 0 && i !== 1) {
-                currentPrice = +((currentPrice * 103) / 100).toFixed(2);
-            }
             try {
                 let tx = await randomMetashipMinterContract
                     .connect(acc2)
@@ -48,6 +45,13 @@ describe('RandomMinter', function () {
                 .connect(acc2)
                 .mintRandom(1, { value: ethers.utils.parseEther(currentPrice.toString()) })
         ).to.be.revertedWith('Not enough ether');
+
+        currentPrice = currentPrice * 103 / 100;
+        
+        tx = await randomMetashipMinterContract
+                    .connect(acc2)
+                    .mintRandom(1, { value: ethers.utils.parseEther(currentPrice.toString()) });
+        await tx.wait();
     });
 
     it('Should sell all nfts and fail after 5016 sold', async function () {
