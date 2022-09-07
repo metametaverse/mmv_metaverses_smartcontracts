@@ -14,7 +14,6 @@ struct LandDetails {
     int8 y;
     int8 z;
     uint parentTokenId;
-    LandType landType;
 }
 
 struct FreeAllocationDetails {

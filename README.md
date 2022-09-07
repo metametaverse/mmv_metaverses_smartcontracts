@@ -13,3 +13,8 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
+//for deploy
+npx hardhat run scripts/MintMetaverses.js --network rinkeby
+
+//for mint
+npx hardhat run scripts/MintMetaverses.js --network rinkeby
