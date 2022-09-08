@@ -46,7 +46,7 @@ contract AssetPurchase is Ownable, ReentrancyGuard {
         require(tokenIdInfo[tokenId].price > 0, "Token id does not exist");
         require(tokenIdInfo[tokenId].price <= msg.value, "Not enough funds");
 
-        payable(tokenIdInfo[tokenId].seller).transfer(tokenIdInfo[tokenId].price - tokenIdInfo[tokenId].price / 100 * (100 - fee));
+        payable(tokenIdInfo[tokenId].seller).transfer(tokenIdInfo[tokenId].price - tokenIdInfo[tokenId].price / 100 * fee);
 
         emit AssetSold(msg.sender, tokenId);
     }
