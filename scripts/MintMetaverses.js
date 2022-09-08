@@ -1,7 +1,13 @@
-const json = require('./landsToMint_stage.json');
+const json = require('./production-addresses.json');
 
 async function main() {
-  const scAddress = '0x3E397a1a5b119212B089432d52897e434E3A69c4'
+  const scAddress = '0xd762fbEBEDAB21543eafc4138664cEA590CeE9a5'
+
+  if(!scAddress){
+    console.log('Define smart contract address');
+    return;
+  }
+
   const [acc1] = await ethers.getSigners();
   const MetashipsNft = await ethers.getContractFactory('MetaverseNft', acc1);
   const contract = await MetashipsNft.attach(scAddress);

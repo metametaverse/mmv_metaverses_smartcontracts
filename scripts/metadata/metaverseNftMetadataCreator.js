@@ -15,7 +15,8 @@ const fs = require('fs');
         const metadata = {
             name: `Metaverse [${x}, ${y}, ${z}]`,
             description: "MetaMetaverse collection",
-            image: `https://metaverse-nft-metadata-images.s3.eu-central-1.amazonaws.com/content/${i}/content`,//'ipfs://bafybeiadugprli2vr5mr4l4qvim6kaulpn5ddgsdzy7l4yll24t3usmaym',
+            image: `https://metaverse-nft-metadata-images.s3.eu-central-1.amazonaws.com/content/${i}/content`,
+            animation_url: 'https://metaverse-nft-metadata-images.s3.eu-central-1.amazonaws.com/1.mp4',
             "external_url": `https://map.metametaverse.io/metamap?zoomTo=x${x}y${y}z${z}`,
             attributes: [
                 {trait_type: 'X', value: x.toString()},

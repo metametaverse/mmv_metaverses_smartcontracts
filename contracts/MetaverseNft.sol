@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "./LandMinterUtils.sol";
 import "./LandMinterTypes.sol";
 
@@ -13,6 +14,8 @@ contract MetaverseNft is ERC721, Ownable {
     using Counters for Counters.Counter;
 
     mapping(uint256 => LandDetails) public tokenIdlandDetails;
+    mapping(address => bool) operators;
+    mapping(uint256 => string) customTokenCid;
 
     event TokenAssigned(
         address indexed to,
@@ -27,7 +30,7 @@ contract MetaverseNft is ERC721, Ownable {
     constructor() ERC721("MMV Land", "MMLD") {}
 
     Counters.Counter private _tokenIDs;
-    string baseUri = "ipfs://bafybeicabn7qaby4scd56y6t75n3bf72vlluby7fzrfqumdcnbfr5hprni/";
+    string baseUri = "ipfs://bafybeibctsaf4qob2a3osdpi54dw5ce75wuxxdtex5qgo2hrqgownxsluq/";
 
     function mintByCoordinates(
         int8 x,
@@ -46,8 +49,27 @@ contract MetaverseNft is ERC721, Ownable {
         _mint(to, tokenId);
     }
 
+    function setOperator(address operator, bool active) public onlyOwner{
+        operators[operator] = active;
+    }
+
+    function setCustomTokenCid(uint tokenId, string calldata cid) external {
+        require(operators[msg.sender], "Only operators permitted");
+
+        customTokenCid[tokenId] = cid;
+    }
+
     function _baseURI() internal view virtual override returns (string memory) {
         return baseUri;
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        if (bytes(customTokenCid[tokenId]).length > 0) {
+            _requireMinted(tokenId);
+            return string(abi.encodePacked("ipfs://", customTokenCid[tokenId]));
+        } else {
+            return super.tokenURI(tokenId);
+        }
     }
 
     function setBaseUri(string memory newBaseUri) external onlyOwner {
