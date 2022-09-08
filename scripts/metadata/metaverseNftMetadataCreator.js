@@ -25,6 +25,6 @@ const fs = require('fs');
             ]
         };
 
-        fs.writeFileSync(`E:/MetaLand/Metadata/${i}`, JSON.stringify(metadata),);
+        fs.writeFileSync(`Metadata/${i}`, JSON.stringify(metadata),);
     }
 })().then(_ => console.log('done'));
