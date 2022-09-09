@@ -32,7 +32,7 @@ contract MetaverseNft is ERC721, Ownable {
         uint256 parentTokenId
     );
 
-    constructor() ERC721("MMV Land", "MMLD") {}
+    constructor() ERC721("MetaMetaverse Lands", "MMVL") {}
 
     Counters.Counter private tokenIDs;
     string baseUri = "ipfs://bafybeiex6vy2hjfvq24g524z33v63a6ir4rbdci7wwmo4qqpd4mnwctczq/";
