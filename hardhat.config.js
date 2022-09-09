@@ -14,6 +14,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 const ALCHEMY_API_KEY = "GpSst7ri8w5BVXGcpdb-3DwJKpAqipfB";
+const ALCHEMY_API_KEY_MAINNET = "9VDyCJ3i_lZgCpr9PGvNflZkkd7gzsum";
 
 // Replace this private key with your Goerli account private key
 // To export your private key from Metamask, open Metamask and
@@ -38,6 +39,11 @@ module.exports = {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
       accounts: [PRIVATE_KEY],
       chainId: 4,
+    },
+    ethereum: {
+      url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
+      accounts: [PRIVATE_KEY],
+      chainId: 1,
     }
   }
 };
