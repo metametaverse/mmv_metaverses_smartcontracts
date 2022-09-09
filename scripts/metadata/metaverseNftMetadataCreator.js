@@ -15,7 +15,7 @@ const fs = require('fs');
 
         const metadata = {
             name: `Metaverse [${x}, ${y}, ${z}]`,
-            description: "Unique Tier 0 metaverse. The metaverse functions as a virtual society and can contain its own games, interactive experiences, economy, and governance. Owner of the metaverse NFT can customize its content, perform administrative functions, and create nested metaverses. Learn mode at metametaverse.io",
+            description: "Unique Tier 0 metaverse. The metaverse functions as a virtual society and can contain its own games, interactive experiences, economy, and governance. Owner of the metaverse NFT can customize its content, perform administrative functions, and create nested metaverses. Learn more at metametaverse.io",
             image: `https://metaverse-nft-metadata-images.s3.eu-central-1.amazonaws.com/media/${i}/metaverse-preview`,
             animation_url: 'https://metaverse-nft-metadata-images.s3.eu-central-1.amazonaws.com/metaverse-animation',
             "external_url": `https://map.metametaverse.io/metamap?zoomTo=x${x}y${y}z${z}`,
