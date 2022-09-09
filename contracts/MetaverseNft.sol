@@ -7,8 +7,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "./LandMinterUtils.sol";
-import "./LandMinterTypes.sol";
+
+struct LandDetails {
+    int8 x;
+    int8 y;
+    int8 z;
+    uint parentTokenId;
+}
 
 contract MetaverseNft is ERC721, Ownable {
     using Counters for Counters.Counter;
