@@ -13,9 +13,9 @@ import "./LandMinterTypes.sol";
 contract MetaverseNft is ERC721, Ownable {
     using Counters for Counters.Counter;
 
-    mapping(uint256 => LandDetails) public tokenIdlandDetails;
+    mapping(uint256 => LandDetails) public tokenIdLandDetails;
     mapping(address => bool) operators;
-    mapping(uint256 => string) customTokenCid;
+    mapping(uint256 => string) customTokenCID;
 
     event TokenAssigned(
         address indexed to,
@@ -29,7 +29,7 @@ contract MetaverseNft is ERC721, Ownable {
 
     constructor() ERC721("MMV Land", "MMLD") {}
 
-    Counters.Counter private _tokenIDs;
+    Counters.Counter private tokenIDs;
     string baseUri = "ipfs://bafybeiex6vy2hjfvq24g524z33v63a6ir4rbdci7wwmo4qqpd4mnwctczq/";
 
     function mintByCoordinates(
@@ -45,7 +45,7 @@ contract MetaverseNft is ERC721, Ownable {
         uint256 tokenId = uint256(
             int256(int16(x + 7) * 225 + int16(y + 7) * 15 + (z + 7) + 1)
         );
-        tokenIdlandDetails[_tokenIDs.current()] = LandDetails(x, y, z, 0);
+        tokenIdLandDetails[tokenIDs.current()] = LandDetails(x, y, z, 0);
         _mint(to, tokenId);
     }
 
@@ -56,7 +56,7 @@ contract MetaverseNft is ERC721, Ownable {
     function setCustomTokenCid(uint tokenId, string calldata cid) external {
         require(operators[msg.sender], "Only operators permitted");
 
-        customTokenCid[tokenId] = cid;
+        customTokenCID[tokenId] = cid;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
@@ -64,9 +64,9 @@ contract MetaverseNft is ERC721, Ownable {
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if (bytes(customTokenCid[tokenId]).length > 0) {
+        if (bytes(customTokenCID[tokenId]).length > 0) {
             _requireMinted(tokenId);
-            return string(abi.encodePacked("ipfs://", customTokenCid[tokenId]));
+            return string(abi.encodePacked("ipfs://", customTokenCID[tokenId]));
         } else {
             return super.tokenURI(tokenId);
         }
@@ -76,12 +76,12 @@ contract MetaverseNft is ERC721, Ownable {
         baseUri = newBaseUri;
     }
 
-    function getTokenDetails(uint256 _tokenId)
+    function getTokenDetails(uint256 tokenId)
         external
         view
         returns (LandDetails memory)
     {
-        require(_exists(_tokenId), "Details requested for non existed token");
-        return tokenIdlandDetails[_tokenId];
+        require(_exists(tokenId), "Details requested for non existed token");
+        return tokenIdLandDetails[tokenId];
     }
 }
