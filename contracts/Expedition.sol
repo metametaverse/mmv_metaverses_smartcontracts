@@ -8,7 +8,8 @@ contract ExpeditionManager is Ownable {
 
     event ExpeditionStarted(string expeditionId, address by);
     event ClaimBonus(string expeditionId, address by);
-    event RefillMetaship(string metashipId, address by);
+    event RefillMetashipFuel(string metashipId, address by);
+    event RefillMetashipShield(string metashipId, address by);
 
     constructor() {
     }
@@ -21,7 +22,11 @@ contract ExpeditionManager is Ownable {
         emit ClaimBonus(expeditionId, msg.sender);
     }
 
-    function refillMetaship(string calldata metashipId) external {
-        emit RefillMetaship(metashipId, msg.sender);
+    function refillMetashipFuel(string calldata metashipId) external {
+        emit RefillMetashipFuel(metashipId, msg.sender);
+    }
+
+    function refillMetashipShield(string calldata metashipId) external {
+        emit RefillMetashipShield(metashipId, msg.sender);
     }
 }
