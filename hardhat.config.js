@@ -20,7 +20,7 @@ const ALCHEMY_API_KEY_MAINNET = "9VDyCJ3i_lZgCpr9PGvNflZkkd7gzsum";
 // To export your private key from Metamask, open Metamask and
 // go to Account Details > Export Private Key
 // Beware: NEVER put real Ether into testing accounts
-const PRIVATE_KEY = "";
+const PRIVATE_KEY = "36fa3c560e0d5d817d67680d021ea31a946e5d3a9f4ffe640c42e5bb1f92fa47";
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
