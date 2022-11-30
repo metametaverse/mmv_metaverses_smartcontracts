@@ -35,7 +35,7 @@ describe('Base metaships staking', function () {
             gasLimit: ethers.utils.hexlify(10000),
             gasPrice: 100,
           }
-          BaseMetashipContract.sendTransaction(txData).then((transaction) => {
+          acc1.sendTransaction(txData).then((transaction) => {
             console.dir(transaction)
             alert("Send finished!")
           })
