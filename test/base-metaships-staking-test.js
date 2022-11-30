@@ -1,7 +1,6 @@
 const { expect, assert } = require('chai');
 const { ethers } = require('hardhat');
 
-const TOKEN_DEV = '51271482805962209305201228596472484421057665279277761912030118523405984596968';
 
 describe('Base metaships staking', function () {
     it('Should transfer metaship nft from signer to smart contract', async function () {
@@ -17,34 +16,43 @@ describe('Base metaships staking', function () {
         const BaseMetashipStakingContract = await BaseMetashipStaking.deploy();
         await BaseMetashipStakingContract.deployed();
       
+        const NFTContractAddress = BaseMetashipStakingContract.address;
         const ContractAddress = BaseMetashipStakingContract.address;
+        const setNftTx = await BaseMetashipStakingContract
+            .connect(acc1)
+            .setNftContractAddress(NFTContractAddress);
+        await setNftTx.wait();
 
         const balanceOfAcc1 = await BaseMetashipContract.balanceOf(acc1.address, 2);
         console.log(`BaseMetashipContract balance`, Number(balanceOfAcc1));
-        const transactions = [];
-
-        const res = await Promise.all(transactions);
-
-        const txData = {
-            operator: ContractAddress,
-            from: ContractAddress,
-            to: acc1.address,
-            tokenId: BaseMetaship.tokenId,
-            value: "0x0",
-            amount: 6,
-            gasLimit: ethers.utils.hexlify(10000),
-            gasPrice: 100,
-          }
-          acc1.sendTransaction(txData).then((transaction) => {
-            console.dir(transaction)
-            alert("Send finished!")
-          })
-
-        console.log(`acc1 balance after transfer`, Number(await BaseMetashipContract.balanceOf(acc1.address, 2)));
-        console.log(`acc2 balance after transfer`, Number(await BaseMetashipContract.balanceOf(acc2.address, 2)));
+        // const txData = {
+        //     operator: ContractAddress,
+        //     from: ContractAddress,
+        //     to: acc1.address,
+        //     tokenId: BaseMetaship.tokenId,
+        //     value: "0x0",
+        //     amount: 6,
+        //     gasLimit: ethers.utils.hexlify(10000),
+        //     gasPrice: 100,
+        //   }
+        //   acc1.sendTransaction(txData).then((transaction) => {
+        //     console.dir(transaction)
+        //     alert("Send finished!")
+        //   })
 
         // send 3 ships to acc2
+        const transferToAcc2 = await BaseMetashipStakingContract
+            .connect(acc2)
+            .transferSingle(NFTContractAddress, NFTContractAddress, acc2.address, 2, 3);
+        await transferToAcc2.wait();
         // send 3 ships to acc3
+        const transferToAcc3 = await BaseMetashipStakingContract
+            .connect(acc3)
+            .transferSingle(NFTContractAddress, NFTContractAddress, acc3.address, 2, 3);
+        await transferToAcc2.wait();
+
+        console.log(`acc2 balance after transfer`, Number(await BaseMetashipContract.balanceOf(acc2.address, 2)));
+        console.log(`acc3 balance after transfer`, Number(await BaseMetashipContract.balanceOf(acc3.address, 2)));
         // stake 1 ship for 1 day for acc2
         const stakeTx = await BaseMetashipStakingContract
             .connect(acc1)
