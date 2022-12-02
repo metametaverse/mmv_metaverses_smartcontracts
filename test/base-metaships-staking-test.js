@@ -1,7 +1,7 @@
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
-const ID = 2;
+const ID = 51271482805962209305201228596472484421057665279277761912030118523405984596968n;
 
 describe('Base metaships staking', function () {
         it('Should transfer metaship nft from signer to smart contract', async function () {
@@ -48,57 +48,37 @@ describe('Base metaships staking', function () {
 
             const balanceOfAcc1 = await BaseMetashipContract.balanceOf(this.accounts[0].address, ID);
             console.log(`Acc1 balance`, Number(balanceOfAcc1));
-            console.log(`acc2 balance after transfer`, Number(await BaseMetashipContract.balanceOf(this.accounts[1].address, 2)));
-            console.log(`acc3 balance after transfer`, Number(await BaseMetashipContract.balanceOf(this.accounts[2].address, 2)));
-            BaseMetashipStakingContract.on('Log', (data) => {
-                console.log(`data`, data);
-            })
-
+            console.log(`acc2 balance after transfer`, Number(await BaseMetashipContract.balanceOf(this.accounts[1].address, ID)));
+            console.log(`acc3 balance after transfer`, Number(await BaseMetashipContract.balanceOf(this.accounts[2].address, ID)));
             
             // stake 1 ship for 1 day for acc2
             const stakeTx = await BaseMetashipStakingContract
                 .connect(this.accounts[1])
                 .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1');
-            await stakeTx.wait()
-            console.log('stake tx', stakeTx)
+            const res = await stakeTx.wait()
+            console.log('stake tx', res.events[0])
             
             
             // try to stake same ship uuid again for acc2
             // const sameStakeTx = await BaseMetashipStakingContract
             //     .connect(this.accounts[1])
-            //     .stake1Day('01216c25-74c3-4578-8e15-0b576bad83b1');
+            //     .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1');
             // await sameStakeTx.wait()
-
-            console.log(`before 100 days`);
             // stake 1 ship for 100 days for acc3
             const stake100Tx = await BaseMetashipStakingContract
                 .connect(this.accounts[2])
                 .stake1Day('01216c25-74c3-4578-8e15-0b576bad84b1');
             await stake100Tx.wait()
-            console.log('stake 100 days tx', stakeTx)
             // unstake ship for acc2
-            // const unstakeTx = await BaseMetashipStakingContract
-            //     .connect(this.accounts[1])
-            //     .unstake('01216c25-74c3-4578-8e15-0b576bad85b1');
-            // const tx = await unstakeTx.wait()
-            // console.log(`unstaked`, tx);
+            const unstakeTx = await BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .unstake('01216c25-74c3-4578-8e15-0b576bad85b1');
+            await unstakeTx.wait()
 
+            const contractBalance = Number(await BaseMetashipContract.balanceOf(ContractAddress, ID))
+            console.log(`contractBalance`, contractBalance);
             // retry stake 1 ship
-            expect(1).to.be.equal(1);
+            expect(contractBalance).to.be.equal(1);
     })
 
 });
-
-const expectThrowsAsync = async (method, errorMessage) => {
-    let error = null
-    try {
-      await method()
-    }
-    catch (err) {
-      error = err
-    }
-    expect(error).to.be.an('Error')
-    if (errorMessage) {
-      expect(error.message).to.equal(errorMessage)
-    }
-  }
