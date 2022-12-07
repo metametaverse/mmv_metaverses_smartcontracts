@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -6,8 +8,8 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract BaseMetashipStaking is ERC1155Holder, Ownable { 
 
-    event BaseMetashipStaked(address indexed from, string indexed uuid, uint indexed stakedAt, uint stakedTill);
-    event BaseMetashipUnstaked(address indexed to, string indexed uuid, uint indexed unstakedAt, uint stakedTill);
+    event BaseMetashipStaked(address indexed from, string indexed filterUuid, string uuid, uint indexed stakedAt, uint stakedTill);
+    event BaseMetashipUnstaked(address indexed to, string indexed filterUuid,  string uuid, uint indexed unstakedAt, uint stakedTill);
 
     ERC1155 metashipsAddress;
     mapping(address => mapping(string => uint)) public stakes;
@@ -33,7 +35,7 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         metashipsAddress.safeTransferFrom(msg.sender, address(this), tokenId, 1, "0x0");
         stakes[msg.sender][uuid] = stakeTill;
         addressStakingCount[msg.sender] += 1;
-        emit BaseMetashipStaked(msg.sender, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipStaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
     }
 
     function stake100Day(string calldata uuid) external payable {
@@ -44,7 +46,7 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         metashipsAddress.safeTransferFrom(msg.sender, address(this), tokenId, 1, "0x0");
         stakes[msg.sender][uuid] = stakeTill;
         addressStakingCount[msg.sender] += 1;
-        emit BaseMetashipStaked(msg.sender, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipStaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
     }
 
     function unstake(string calldata uuid) external payable {
@@ -54,6 +56,6 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         metashipsAddress.safeTransferFrom(address(this), msg.sender, tokenId, 1, "0x0");
         addressStakingCount[msg.sender] -= 1;
 
-        emit BaseMetashipUnstaked(msg.sender, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipUnstaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
     }
 }
