@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat compile & npx hardhat test ./test/base-metaships-staking-test.js"
+    "test": "npx hardhat compile & npx hardhat test"
   },
   "repository": {
     "type": "git",

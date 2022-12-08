@@ -1,13 +1,14 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const { ethers } = require('hardhat');
 
+// tokenId of BaseMetaShip NFT in opensea testnet
 const ID = 51271482805962209305201228596472484421057665279277761912030118523405984596968n;
 
 describe('Base metaships staking', function () {
         it('Should transfer metaship nft from signer to smart contract', async function () {
             this.accounts =  await ethers.getSigners();
             // init contract for minting base metaship nfts
-            const BaseMetaship = await ethers.getContractFactory('BaseMetaship', this.accounts[0]);
+            const BaseMetaship = await ethers.getContractFactory('BaseMetashipMock', this.accounts[0]);
             const BaseMetashipContract = await BaseMetaship.deploy();
             await BaseMetashipContract.deployed();
 
@@ -52,18 +53,16 @@ describe('Base metaships staking', function () {
             console.log(`acc3 balance after transfer`, Number(await BaseMetashipContract.balanceOf(this.accounts[2].address, ID)));
             
             // stake 1 ship for 1 day for acc2
-            const stakeTx = await BaseMetashipStakingContract
+            await BaseMetashipStakingContract
                 .connect(this.accounts[1])
                 .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1');
-            const res = await stakeTx.wait()
-            console.log('stake tx', res.events[0])
             
             
             // try to stake same ship uuid again for acc2
-            // const sameStakeTx = await BaseMetashipStakingContract
-            //     .connect(this.accounts[1])
-            //     .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1');
-            // await sameStakeTx.wait()
+            await expect(BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1'))
+                .to.be.revertedWith('This metaship is already staked')
             // stake 1 ship for 100 days for acc3
             const stake100Tx = await BaseMetashipStakingContract
                 .connect(this.accounts[2])
@@ -74,11 +73,30 @@ describe('Base metaships staking', function () {
                 .connect(this.accounts[1])
                 .unstake('01216c25-74c3-4578-8e15-0b576bad85b1');
             await unstakeTx.wait()
+            // stake again unstaked ship
+            const stakeAgainTx = await BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .stake1Day('01216c25-74c3-4578-8e15-0b576bad85b1');
+            await stakeAgainTx.wait()
+
+            // stake more than 3 ships for acc2
+            // should cause an error
+            await BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .stake1Day('01216c25-74c3-4578-8e15-0b576bad91b2');
+            await BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .stake1Day('01216c25-74c3-4578-8e15-0b576bad91b3');
+            await expect(BaseMetashipStakingContract
+                .connect(this.accounts[1])
+                .stake1Day('01216c25-74c3-4578-8e15-0b576bad91b4'))
+                .to.be.revertedWith('Increased staking count limit');
+
 
             const contractBalance = Number(await BaseMetashipContract.balanceOf(ContractAddress, ID))
             console.log(`contractBalance`, contractBalance);
             // retry stake 1 ship
-            expect(contractBalance).to.be.equal(1);
+            expect(contractBalance).to.be.equal(4);
     })
 
 });
