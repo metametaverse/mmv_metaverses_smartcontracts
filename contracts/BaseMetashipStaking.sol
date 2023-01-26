@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract BaseMetashipStaking is ERC1155Holder, Ownable { 
 
-    event BaseMetashipStaked(address indexed from, string indexed filterUuid, string uuid, uint indexed stakedAt, uint stakedTill);
-    event BaseMetashipUnstaked(address indexed to, string indexed filterUuid,  string uuid, uint indexed unstakedAt, uint stakedTill);
+    event BaseMetashipStaked(address indexed from, uint indexed stakedAt, string uuid, uint stakedTill);
+    event BaseMetashipUnstaked(address indexed to, uint indexed unstakedAt, string uuid, uint stakedTill);
 
     IERC1155 metashipsAddress;
     mapping(address => mapping(string => uint)) public stakes;
@@ -35,7 +35,7 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         metashipsAddress.safeTransferFrom(msg.sender, address(this), TOKEN_ID, 1, "0x0");
         stakes[msg.sender][uuid] = stakeTill;
         addressStakingCount[msg.sender] += 1;
-        emit BaseMetashipStaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipStaked(msg.sender, block.timestamp, uuid, stakeTill);
     }
 
     function stake100Day(string calldata uuid) external payable {
@@ -46,7 +46,7 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         metashipsAddress.safeTransferFrom(msg.sender, address(this), TOKEN_ID, 1, "0x0");
         stakes[msg.sender][uuid] = stakeTill;
         addressStakingCount[msg.sender] += 1;
-        emit BaseMetashipStaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipStaked(msg.sender, block.timestamp, uuid, stakeTill);
     }
 
     function unstake(string calldata uuid) external payable {
@@ -57,6 +57,6 @@ contract BaseMetashipStaking is ERC1155Holder, Ownable {
         stakes[msg.sender][uuid] = 0;
         addressStakingCount[msg.sender] -= 1;
 
-        emit BaseMetashipUnstaked(msg.sender, uuid, uuid, block.timestamp, stakeTill);
+        emit BaseMetashipUnstaked(msg.sender, block.timestamp, uuid, stakeTill);
     }
 }
