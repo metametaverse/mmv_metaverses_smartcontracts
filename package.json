@@ -27,6 +27,8 @@
     "hardhat": "^2.9.9"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.0"
+    "@openzeppelin/contracts": "^4.7.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "ts-node": "^10.9.1"
   }
 }

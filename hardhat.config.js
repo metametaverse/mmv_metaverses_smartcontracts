@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-ethers");
+require('hardhat-gas-reporter');
 
 // require("@nomicfoundation/hardhat-toolbox");
 
@@ -13,7 +14,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-const ALCHEMY_API_KEY = "GpSst7ri8w5BVXGcpdb-3DwJKpAqipfB";
+const ALCHEMY_API_KEY = "oUQT-cJU4z5oXuNFzM8Q2EbhUPpVlsNh";
 const ALCHEMY_API_KEY_MAINNET = "9VDyCJ3i_lZgCpr9PGvNflZkkd7gzsum";
 
 // Replace this private key with your Goerli account private key
@@ -34,11 +35,18 @@ module.exports = {
   mocha: {
     timeout: 100000000
   },
+  gasReporter: {
+    enabled: true
+  },
   networks: {
-    rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    hardhat: {
+      gasPrice: 470000000000,
+      chainId: 43112,
+    },
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
       accounts: [PRIVATE_KEY],
-      chainId: 4,
+      chainId: 5,
     },
     ethereum: {
       url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
