@@ -2,4 +2,5 @@
 *.deps
 /artifacts
 /node_modules
+/typechain-types
 /cache

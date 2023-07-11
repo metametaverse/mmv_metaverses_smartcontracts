@@ -1,18 +1,17 @@
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-ethers");
-require('hardhat-gas-reporter');
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
 
 // require("@nomicfoundation/hardhat-toolbox");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+// task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+//   const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
+//   for (const account of accounts) {
+//     console.log(account.address);
+//   }
+// });
 
 const ALCHEMY_API_KEY = "oUQT-cJU4z5oXuNFzM8Q2EbhUPpVlsNh";
 const ALCHEMY_API_KEY_MAINNET = "9VDyCJ3i_lZgCpr9PGvNflZkkd7gzsum";
@@ -29,29 +28,30 @@ const PRIVATE_KEY = "";
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-module.exports = {
+
+const config: HardhatUserConfig = {
   solidity: "0.8.7",
   defaultNetwork: "hardhat",
   mocha: {
     timeout: 100000000
-  },
-  gasReporter: {
-    enabled: true
   },
   networks: {
     hardhat: {
       gasPrice: 470000000000,
       chainId: 43112,
     },
-    goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-      accounts: [PRIVATE_KEY],
-      chainId: 5,
-    },
-    ethereum: {
-      url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
-      accounts: [PRIVATE_KEY],
-      chainId: 1,
-    }
+    // goerli: {
+    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   accounts: [PRIVATE_KEY],
+    //   chainId: 5,
+    // },
+    // ethereum: {
+    //   url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
+    //   accounts: [PRIVATE_KEY],
+    //   chainId: 1,
+    // }
   }
-};
+}
+
+export default config;
+
