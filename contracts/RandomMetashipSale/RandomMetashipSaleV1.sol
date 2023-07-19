@@ -110,7 +110,7 @@ contract RandomMetashipSaleV1 is
 
     function startSale(uint256 saleId) external onlyOwner {
         require(
-            saleInfo[currentSaleId].finished,
+            saleInfo[currentSaleId].finished || saleId == 1,
             "Previous sale hasn't been finished yet"
         );
         require(
@@ -152,7 +152,7 @@ contract RandomMetashipSaleV1 is
 
         require(
             saleInfo[saleId].started && !saleInfo[saleId].finished,
-            "Sale already closed"
+            "Sale already closed or not started yet"
         );
         require(!getRoot(saleId), "All metaships already sold");
         require(
@@ -254,7 +254,7 @@ contract RandomMetashipSaleV1 is
     ) private {
         uint256 depth = MathLibrary.log2(batchSize);
         saleInfo[saleId] = CurrentSaleInfo(
-            true,
+            false,
             false,
             currentPrice,
             batchSize,

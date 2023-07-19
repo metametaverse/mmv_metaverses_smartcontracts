@@ -57,6 +57,8 @@ describe("MerkleTree", function () {
         const setSaleTx = await contract.setSale(1, ethers.parseEther("0.02"), 3, 100, 1000, acc1Address);
         await setSaleTx.wait();
 
+        await expect((contract.connect(acc2) as Contract).buy(1, 1, { value: ethers.parseEther('0.03'), gasLimit: 300000 })).to.be.revertedWith('Sale already closed or not started yet')
+        
         const startSaleTx = await contract.startSale(1);
         await startSaleTx.wait();
 
@@ -71,11 +73,6 @@ describe("MerkleTree", function () {
 
         await prepareRandomWords(vrfCoordinator, acc1);
 
-        const a = await contract.COORDINATOR();
-        const b = await vrfCoordinator._consumer();
-        console.log(a);
-        console.log(b);
-
         const gases = [];
         for (let i = 1; i <= 1000; i++) {
             const buyTx = await (contract.connect(acc2) as Contract).buy(1, 1, { value: ethers.parseEther('0.03'), gasLimit: 300000 });
@@ -87,7 +84,6 @@ describe("MerkleTree", function () {
         }
 
         console.log(Math.max(...gases));
-        console.log(await contract.positionTokenId(1, 777));
 
         await expect(contract.buy(1, 1, { value: ethers.parseEther('0.05') })).to.be.revertedWith('All metaships already sold');
     });
@@ -159,11 +155,6 @@ describe("MerkleTree", function () {
 
         await prepareRandomWords2(vrfCoordinator, acc1);
 
-        const a = await contract.COORDINATOR();
-        const b = await vrfCoordinator._consumer();
-        console.log(a);
-        console.log(b);
-
         const gases = [];
         console.log('here');
         for (let i = 1; i <= 50; i++) {
@@ -173,11 +164,9 @@ describe("MerkleTree", function () {
             const fulfillTx = await vrfCoordinator.fulfillRandomWords(i);
             const res = await fulfillTx.wait();
             gases.push(+ethers.formatUnits(res.gasUsed, 0));
-            console.log(i);
         }
 
         console.log(Math.max(...gases));
-        console.log(await contract.positionTokenId(1, 777));
 
         await expect(contract.buy(1, 1, { value: ethers.parseEther('0.05') })).to.be.revertedWith('All metaships already sold');
     });
@@ -346,11 +335,6 @@ describe("MerkleTree", function () {
 
         await prepareRandomWords2(vrfCoordinator, acc1);
 
-        const a = await contract.COORDINATOR();
-        const b = await vrfCoordinator._consumer();
-        console.log(a);
-        console.log(b);
-
         const gases = [];
         console.log('here');
         for (let i = 1; i <= 100; i++) {
@@ -364,7 +348,7 @@ describe("MerkleTree", function () {
 
         const stopSaleTx = await contract.finishSale(1);
         await stopSaleTx.wait();
-        await expect(contract.buy(1, 1, { value: ethers.parseEther('0.0206') })).to.be.revertedWith('Sale already closed');
+        await expect(contract.buy(1, 1, { value: ethers.parseEther('0.0206') })).to.be.revertedWith('Sale already closed or not started yet');
 
         const tokenIds = Array.from(Array(100).keys()).map(s => s + 101);
         const setTokenIdsForSaleTx = await contract.setTokensForSale(2, tokenIds, 0);
@@ -376,7 +360,7 @@ describe("MerkleTree", function () {
         const startSale2Tx = await contract.startSale(2);
         await startSale2Tx.wait();
 
-        await expect(contract.buy(1, 1, { value: ethers.parseEther('0.0206') })).to.be.revertedWith('Sale already closed');
+        await expect(contract.buy(1, 1, { value: ethers.parseEther('0.0206') })).to.be.revertedWith('Sale already closed or not started yet');
 
         const transferTx = await (nft.connect(acc2) as Contract).transferFrom(acc2Address, acc1Address, 101)
         await transferTx.wait();
@@ -388,7 +372,6 @@ describe("MerkleTree", function () {
             const fulfillTx = await vrfCoordinator.fulfillRandomWords(100 + i);
             const res = await fulfillTx.wait();
             gases.push(+ethers.formatUnits(res.gasUsed, 0));
-            console.log(i);
         }
 
         await expect((contract.connect(acc2) as Contract).buy(2, 1, { value: ethers.parseEther('0.03'), gasLimit: 1000000 })).to.be.revertedWith('All metaships already sold')

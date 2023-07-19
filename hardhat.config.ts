@@ -40,11 +40,11 @@ const config: HardhatUserConfig = {
       gasPrice: 470000000000,
       chainId: 43112,
     },
-    goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-      accounts: [PRIVATE_KEY],
-      chainId: 5,
-    },
+    // goerli: {
+    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   accounts: [PRIVATE_KEY],
+    //   chainId: 5,
+    // },
     // ethereum: {
     //   url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
     //   accounts: [PRIVATE_KEY],
