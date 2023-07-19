@@ -280,7 +280,7 @@ contract RandomMetashipSaleV1 is
     }
 
     function findNearestPosition(uint256 sellId, uint256 position)
-        public
+        private
         view
         returns (uint256)
     {
