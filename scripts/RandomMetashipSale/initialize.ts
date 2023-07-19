@@ -1,46 +1,53 @@
 import { ethers } from 'hardhat';
 import fs from 'fs';
 
-const proxyAddress = '0x45D0a9e1Fb8a4F9Cccc4aC989C792414927930b1';
-const vrfCoordinatorAddress = '0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D';
-const nftMetashipAddress = '0xec2343d9b4431fa7fc3be12dd9d31b735fcdfa3f';
-const sobscriptionId = 3900;
-const saleId = 2;
-const oldSaleId = 1;
-const saleFromAddress = '0x7805D3a3318c66B6BF87853B7663c04F6272a45c';
+
+const proxyAddresses = {
+    dev: '0x5f53A23A03Db0Bd2C182Ad4aA02101525CA37C29',
+    stage: '0xc749D5612C2C29963ed8A6509D9e767668dB1c43',
+    production: ''
+};
+
+const vrfCoordinatorAddresses = {
+    dev: '0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D',
+    stage: '0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D',
+    production: '0x271682DEB8C4E0901D1a1550aD2e64D568E69909'
+}
+
+const keyHashes = {
+    dev: '0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15',
+    stage: '0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15',
+    production: '0x8af398995b04c28e9951adb9721ef74c74f93e6a478f39e7e0777be13527e7ef'
+}
+
+const nftMetashipAddresses = {
+    dev: '0xec2343d9b4431fa7fc3be12dd9d31b735fcdfa3f',
+    stage: '0xec2343d9b4431fa7fc3be12dd9d31b735fcdfa3f',
+    production: '0xa712db506be314b78d98df53a501dbb1d1807af6'
+}
+
+const subscriptionIds = {
+    dev: 3900,
+    stage: 3900,
+    production: null
+};
+
+const env = 'stage';
+const proxyAddress = proxyAddresses[env];
+const vrfCoordinatorAddress = vrfCoordinatorAddresses[env];
+const keyHash = keyHashes[env];
+const nftAddress = nftMetashipAddresses[env];
+
+const sobscriptionId = subscriptionIds[env];
+
 (async () => {
 
     const [acc1] = await ethers.getSigners();
-    const acc1Address = await acc1.getAddress();
-    const contractFactory = await ethers.getContractFactory("RandomMetashipSaleV1");
+    const contractFactory = await ethers.getContractFactory("RandomMetashipSaleV1", acc1);
     const proxy = await contractFactory.attach(proxyAddress);
 
-    // const initTx = await proxy.initialize(vrfCoordinatorAddress, sobscriptionId);
-    // await initTx.wait();
+    const initTx = await proxy.initialize(vrfCoordinatorAddress, sobscriptionId, keyHash, nftAddress);
+    await initTx.wait();
 
-    // const finishSaleTx = await proxy.finishSale(oldSaleId, {gasLimit: 300000});
-    // await finishSaleTx.wait();
-
-    const json = fs.readFileSync('E:/preparedMetashipIds.json', 'utf-8');
-    const tokenIds = JSON.parse(json).results as number[];
-    const length = tokenIds.length;
-    let i = 0;
-    while (tokenIds.length > 0) {
-        const batch = tokenIds.splice(0, 100);
-        const setTokensForSaleTx = await proxy.setTokensForSale(saleId, batch, i * 100);
-        await setTokensForSaleTx.wait();
-        i++;
-        console.log(i);
-    }
-
-    const setSaleTx = await proxy.setSale(saleId, ethers.parseEther("0.02"), 3, 10, length, saleFromAddress);
-    await setSaleTx.wait();
-
-    // const setNftAddressTx = await proxy.setNftSmartContractAddress(nftMetashipAddress);
-    // await setNftAddressTx.wait();
-
-    const startSaleTx = await proxy.startSale(saleId);
-    await startSaleTx.wait();
-
-
+    console.log('Owner', await proxy.owner());
 })().then(_ => console.log('done'));

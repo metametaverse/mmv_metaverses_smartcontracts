@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract, Signer } from "ethers";
 
+const keyHash = '0x48656c6c6f576f726c6400000000000000000000000000000000000000000000';
 describe("MerkleTree", function () {
     it("Basic", async function () {
         const [acc1, acc2] = await ethers.getSigners();
@@ -40,7 +41,7 @@ describe("MerkleTree", function () {
         const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
         const contract = await contractDeployer.attach(proxyAddress);
 
-        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900);
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
         await initTx.wait();
 
         for (let i = 0; i < 10; i++) {
@@ -58,12 +59,9 @@ describe("MerkleTree", function () {
         await setSaleTx.wait();
 
         await expect((contract.connect(acc2) as Contract).buy(1, 1, { value: ethers.parseEther('0.03'), gasLimit: 300000 })).to.be.revertedWith('Sale already closed or not started yet')
-        
+
         const startSaleTx = await contract.startSale(1);
         await startSaleTx.wait();
-
-        const setNftAddressTx = await contract.setNftSmartContractAddress(nftAddress);
-        await setNftAddressTx.wait();
 
         const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
         await setApproveTx.wait();
@@ -124,7 +122,7 @@ describe("MerkleTree", function () {
         const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
         const contract = await contractDeployer.attach(proxyAddress);
 
-        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900);
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
         await initTx.wait();
 
         for (let i = 0; i < 10; i++) {
@@ -143,9 +141,6 @@ describe("MerkleTree", function () {
 
         const startSaleTx = await contract.startSale(1);
         await startSaleTx.wait();
-
-        const setNftAddressTx = await contract.setNftSmartContractAddress(nftAddress);
-        await setNftAddressTx.wait();
 
         const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
         await setApproveTx.wait();
@@ -207,7 +202,7 @@ describe("MerkleTree", function () {
         const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
         const contract = await contractDeployer.attach(proxyAddress);
 
-        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900);
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
         await initTx.wait();
 
         for (let i = 0; i < 10; i++) {
@@ -227,9 +222,6 @@ describe("MerkleTree", function () {
         await startSaleTx.wait();
 
         console.log('CurrentPrice:', await getCurrentPrice(contract));
-
-        const setNftAddressTx = await contract.setNftSmartContractAddress(nftAddress);
-        await setNftAddressTx.wait();
 
         const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
         await setApproveTx.wait();
@@ -304,7 +296,7 @@ describe("MerkleTree", function () {
         const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
         const contract = await contractDeployer.attach(proxyAddress);
 
-        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900);
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
         await initTx.wait();
 
         for (let i = 0; i < 10; i++) {
@@ -323,9 +315,6 @@ describe("MerkleTree", function () {
         const startSaleTx = await contract.startSale(1);
         await startSaleTx.wait();
         console.log('CurrentPrice:', await getCurrentPrice(contract));
-
-        const setNftAddressTx = await contract.setNftSmartContractAddress(nftAddress);
-        await setNftAddressTx.wait();
 
         const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
         await setApproveTx.wait();
@@ -413,7 +402,7 @@ describe("MerkleTree", function () {
         const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
         const contract = await contractDeployer.attach(proxyAddress);
 
-        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900);
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
         await initTx.wait();
 
         for (let i = 0; i < 10; i++) {
@@ -434,9 +423,6 @@ describe("MerkleTree", function () {
 
         console.log('CurrentPrice:', await getCurrentPrice(contract));
 
-        const setNftAddressTx = await contract.setNftSmartContractAddress(nftAddress);
-        await setNftAddressTx.wait();
-
         const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
         await setApproveTx.wait();
 
@@ -444,7 +430,7 @@ describe("MerkleTree", function () {
         await setConsumerTx.wait();
 
         await prepareRandomWords3(vrfCoordinator, acc1);
-        
+
         const gases = [];
         for (let i = 1; i <= 1000; i++) {
 
@@ -474,6 +460,81 @@ describe("MerkleTree", function () {
 
         expect(balanceAcc2 - balanceAcc2Init).to.be.greaterThan(balance - 0.005);
         expect(balanceAcc2 - balanceAcc2Init).to.be.lessThan(balance + 0.005);
+    });
+
+    it("OnlyOperator", async function () {
+        const [acc1, acc2] = await ethers.getSigners();
+        const acc1Address = await acc1.getAddress();
+        const acc2Address = await acc2.getAddress();
+
+        const nftDeployer = await ethers.getContractFactory('NftForTest', acc1 as any);
+        const nft = await nftDeployer.deploy() as Contract;
+        await nft.waitForDeployment();
+        const nftAddress = await nft.getAddress();
+
+        const vrfCoordinatorDeployer = await ethers.getContractFactory("MockVRFCoordinator", acc1 as any);
+        const vrfCoordinator = await vrfCoordinatorDeployer.deploy() as Contract;
+        await vrfCoordinator.waitForDeployment();
+        const vrfCoordinatorAddress = vrfCoordinator.getAddress();
+
+        const proxyAdminDeployer = await ethers.getContractFactory('ProxyAdmin', acc1 as any);
+        const proxyAdmin = await proxyAdminDeployer.deploy() as Contract;
+        await proxyAdmin.waitForDeployment();
+        const proxyAdminAddress = await proxyAdmin.getAddress();
+        console.log('ProxyAdmin:', proxyAdminAddress);
+
+        const implementationDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
+        const implementation = await implementationDeployer.deploy() as Contract;
+        await implementation.waitForDeployment();
+        const implementationAddress = await implementation.getAddress();
+        console.log('Implementation:', implementationAddress);
+
+        const proxyDeployer = await ethers.getContractFactory('Proxy', acc1 as any);
+        const proxy = await proxyDeployer.deploy(proxyAdminAddress, implementationAddress) as Contract;
+        await proxy.waitForDeployment();
+        const proxyAddress = await proxy.getAddress();
+        console.log('Proxy:', proxyAddress);
+
+        const contractDeployer = await ethers.getContractFactory('RandomMetashipSaleV1', acc1 as any);
+        const contract = await contractDeployer.attach(proxyAddress);
+
+        const initTx = await contract.initialize(vrfCoordinatorAddress, 3900, keyHash, nftAddress);
+        await initTx.wait();
+
+        for (let i = 0; i < 10; i++) {
+            const mintTx = await nft.Mint();
+            await mintTx.wait();
+
+            const tokenIds = Array.from(Array(100).keys()).map(s => s + + 100 * i + 1);
+
+            const setTokenIdsForSaleTx = await contract.setTokensForSale(1, tokenIds, i * 100);
+            const res = await setTokenIdsForSaleTx.wait();
+            console.log(res.gasUsed);
+        }
+
+        const setSaleTx = await contract.setSale(1, ethers.parseEther("0.02"), 3, 100, 1000, acc1Address);
+        await setSaleTx.wait();
+
+        await expect((contract.connect(acc2) as Contract).buy(1, 1, { value: ethers.parseEther('0.03'), gasLimit: 300000 })).to.be.revertedWith('Sale already closed or not started yet')
+
+        await expect(contract.markAsSold(1, 3)).to.be.revertedWith('Sale not started or already finished');
+
+        const startSaleTx = await contract.startSale(1);
+        await startSaleTx.wait();
+
+        const setApproveTx = await nft.setApprovalForAll(proxyAddress, true);
+        await setApproveTx.wait();
+
+        const markAsSoldTx = await contract.markAsSold(1, 2);
+        await markAsSoldTx.wait();
+
+        await expect((contract.connect(acc2) as Contract).markAsSold(1, 3)).to.be.revertedWith('Only operator permitted');
+
+        const setOperatorTx = await contract.setOperator(acc2Address);
+        await setOperatorTx.wait();
+
+        const markAsSold2Tx = await (contract.connect(acc2) as Contract).markAsSold(1, 3);
+        await markAsSold2Tx.wait();
     });
 });
 

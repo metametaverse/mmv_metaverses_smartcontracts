@@ -40,6 +40,11 @@ contract RandomMetashipSaleV1 is
         uint256 amount;
     }
 
+    modifier onlyOperator() {
+        require(msg.sender == operator, "Only operator permitted");
+        _;
+    }
+
     mapping(uint256 => CurrentSaleInfo) public saleInfo;
     mapping(uint256 => mapping(uint256 => uint256)) positionTokenId;
     mapping(uint256 => mapping(uint256 => mapping(uint256 => bool))) merkleTree;
@@ -52,8 +57,9 @@ contract RandomMetashipSaleV1 is
     bytes32 keyHash;
     uint64 subscriptionId;
     VRFCoordinatorV2Interface COORDINATOR;
+    address public operator;
 
-    function initialize(address _vrfCoordinator, uint64 _subscriptionId)
+    function initialize(address _vrfCoordinator, uint64 _subscriptionId, bytes32 _keyHash, address _nftSmartContractAddress)
         public
         initializer
     {
@@ -62,12 +68,18 @@ contract RandomMetashipSaleV1 is
         VRFConsumerBaseV2Upgradable.initialize(_vrfCoordinator);
         COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);
         subscriptionId = _subscriptionId;
-        keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15;
+        keyHash = _keyHash;
 
         OwnableUpgradeable.__Ownable_init();
         OwnableUpgradeable.transferOwnership(msg.sender);
 
         saleInfo[0].finished = true;
+        operator = msg.sender;
+        nftSmartContractAddress = IERC721(_nftSmartContractAddress);
+    }
+
+    function setKeyHashChainlink(bytes32 _keyhash) external onlyOwner() {
+        keyHash = _keyhash;
     }
 
     function setTokensForSale(
@@ -84,6 +96,15 @@ contract RandomMetashipSaleV1 is
 
     function setMaxBatchSize(uint size) external onlyOwner {
         maxBatchSize = size;
+    }
+
+    function markAsSold(uint saleId, uint position) external onlyOperator {
+        require(saleInfo[saleId].started && !saleInfo[saleId].finished, "Sale not started or already finished");
+        recalculateMerkle(saleId, position);
+    }
+
+    function setOperator(address _operator) external onlyOwner {
+        operator = _operator;
     }
 
     function setSale(
