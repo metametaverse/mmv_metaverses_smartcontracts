@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {ITransparentUpgradeableProxy} from "./ITransparentUpgradeableProxy.sol";
+import {ITransparentUpgradeableProxy} from "../Common/ITransparentUpgradeableProxy.sol";
  
 contract ProxyAdmin is Ownable {
     /**

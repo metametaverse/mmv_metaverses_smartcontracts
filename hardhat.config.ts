@@ -30,7 +30,7 @@ const PRIVATE_KEY = "";
  */
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.7",
+  solidity: "0.8.20",
   defaultNetwork: "hardhat",
   mocha: {
     timeout: 100000000
@@ -40,11 +40,11 @@ const config: HardhatUserConfig = {
       gasPrice: 470000000000,
       chainId: 43112,
     },
-    // goerli: {
-    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-    //   accounts: [PRIVATE_KEY],
-    //   chainId: 5,
-    // },
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      accounts: [PRIVATE_KEY],
+      chainId: 5,
+    },
     // ethereum: {
     //   url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY_MAINNET}`,
     //   accounts: [PRIVATE_KEY],
