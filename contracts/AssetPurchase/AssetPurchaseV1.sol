@@ -79,7 +79,7 @@ contract AssetPurchase is Initializable, OwnableUpgradeable, ReentrancyGuard {
         );
 
         require(nonceListing[_nonce].price > 0, "Listing doesn't exists");
-        require(nonceListing[_nonce].price <= msg.value, "Not enough funds");
+        require(nonceListing[_nonce].price * amount <= msg.value, "Not enough funds");
         require(nonceListing[_nonce].amount >= amount, "Insufficient amount");
         require(!nonceListing[_nonce].sold, "Already sold");
         require(nftSmartContractAddress.balanceOf(nonceListing[_nonce].seller, tokenId) >= amount, "Insufficient seller balance");
